@@ -2,9 +2,16 @@
 from fastapi import FastAPI,status 
 from sqlalchemy import create_engine,Column,Integer,String,func,DateTime
 from sqlalchemy.ext.declarative import declarative_base
+from pydantic import BaseModel
 
 
 
+
+
+#create ToDoRequest Base Model 
+
+class ToDoRequest(BaseModel):
+    task:str
 
 # Create a sqlite engine instance
 engine = create_engine("sqlite:///todooo.db")
@@ -34,7 +41,7 @@ def root():
 
 
 @app.post("/todo",status_code=status.HTTP_201_CREATED)
-def create_todo():
+def create_todo(todo:ToDoRequest):
     return "create todo item"
 
 @app.get("/todo/{id}")
