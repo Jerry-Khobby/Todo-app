@@ -14,8 +14,6 @@ from datetime import datetime
 
 class ToDoRequest(BaseModel):
     task:str
-    another_task:str
-    createdAt:datetime
 
 # Create a sqlite engine instance
 engine = create_engine("sqlite:///todooo.db")
@@ -28,8 +26,6 @@ class Todo(Base):
     __tablename__="todos"
     id= Column(Integer,primary_key=True)
     task=Column(String(256))
-    createdAt=Column(DateTime(timezone=True),default=func.now())
-    another_task=Column(String(256))
 
 
 # Create the database
@@ -47,6 +43,10 @@ def root():
     #I will be adding my template file over , over here will take my index.html 
     return "todooo"
 
+
+## when I added the created and the other ones they were not present 
+#So unless I drop the database and add another one before I can be able to work to with it 
+
 @app.post("/todo", status_code=status.HTTP_201_CREATED)
 def create_todo(todo: ToDoRequest):
     try:
@@ -54,7 +54,7 @@ def create_todo(todo: ToDoRequest):
         session = Session(bind=engine, expire_on_commit=False)
 
         # create an instance of the ToDo database model
-        tododb = Todo(task=todo.task, another_task=todo.another_task,createdAt=todo.createdAt)
+        tododb = Todo(task=todo.task,)
 
         # add it to the session and commit it
         session.add(tododb)
@@ -62,14 +62,12 @@ def create_todo(todo: ToDoRequest):
 
         # grab the id, createdAt, and another_task values from the database object
         id = tododb.id
-        created_at = tododb.createdAt
-        another_task = tododb.another_task
 
         # close the session
         session.close()
 
         # return the id, createdAt, and another_task values in the response
-        return {"id": id, "task": todo.task, "createdAt": created_at, "another_task": another_task}
+        return {"id": id, "task": todo.task}
 
     except Exception as e:
         # Handle exceptions and rollback the transaction if there's an error
